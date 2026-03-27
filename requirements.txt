@@ -1,0 +1,6 @@
+azure-ai-projects
+azure-ai-agents
+azure-identity
+azure-search-documents
+semantic-kernel
+python-dotenv
