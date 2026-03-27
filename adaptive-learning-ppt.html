@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0f0f0f;color:#fff;overflow:hidden;height:100vh;width:100vw}
+.deck{width:100%;height:100vh;position:relative}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:48px 56px;opacity:0;pointer-events:none;transition:opacity .4s}
+.slide.active{opacity:1;pointer-events:all}
+
+/* Slide backgrounds */
+.s1{background:linear-gradient(135deg,#0a0a2e 0%,#1a1a4e 40%,#2d1b69 100%)}
+.s2{background:linear-gradient(135deg,#0d1117 0%,#161b22 100%)}
+.s3{background:linear-gradient(135deg,#0a192f 0%,#112240 100%)}
+.s4{background:linear-gradient(135deg,#0d1117 0%,#1a1a2e 100%)}
+.s5{background:linear-gradient(135deg,#0a192f 0%,#0d2137 100%)}
+.s6{background:linear-gradient(135deg,#0d1117 0%,#161b22 100%)}
+.s7{background:linear-gradient(135deg,#0a192f 0%,#112240 100%)}
+.s8{background:linear-gradient(135deg,#0d1117 0%,#1a1a2e 100%)}
+.s9{background:linear-gradient(135deg,#0a192f 0%,#0d2137 100%)}
+.s10{background:linear-gradient(135deg,#0a0a2e 0%,#1a1a4e 40%,#2d1b69 100%)}
+
+.slide-num{position:absolute;bottom:20px;right:32px;font-size:13px;color:rgba(255,255,255,.35);font-weight:500}
+.tag{display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:16px}
+.tag-purple{background:rgba(139,92,246,.2);color:#a78bfa;border:1px solid rgba(139,92,246,.3)}
+.tag-blue{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.25)}
+.tag-green{background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.25)}
+.tag-orange{background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.25)}
+
+h1{font-size:42px;font-weight:800;line-height:1.15;margin-bottom:12px;background:linear-gradient(135deg,#fff 0%,#c4b5fd 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:32px;font-weight:700;margin-bottom:8px;color:#f1f5f9}
+h3{font-size:18px;font-weight:600;color:#e2e8f0;margin-bottom:8px}
+.subtitle{font-size:18px;color:rgba(255,255,255,.55);font-weight:400;line-height:1.5;margin-bottom:20px}
+p{font-size:14px;color:rgba(255,255,255,.7);line-height:1.65}
+
+/* Navigation */
+.nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:100;background:rgba(0,0,0,.6);backdrop-filter:blur(12px);padding:8px 16px;border-radius:40px;border:1px solid rgba(255,255,255,.1)}
+.nav button{width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.nav button:hover{background:rgba(139,92,246,.5)}
+.nav .counter{display:flex;align-items:center;font-size:13px;color:rgba(255,255,255,.5);padding:0 10px;font-weight:500}
+
+/* Diagram containers */
+.diagram-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;flex:1;overflow:auto;position:relative}
+.diagram-box svg{width:100%;height:100%}
+
+/* Cards & grids */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:12px}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:18px}
+.card h3{font-size:15px;margin-bottom:6px}
+.card p{font-size:13px}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.tbl th{text-align:left;padding:10px 14px;background:rgba(139,92,246,.15);color:#c4b5fd;font-weight:600;border-bottom:1px solid rgba(255,255,255,.1)}
+.tbl td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.75)}
+.tbl tr:hover td{background:rgba(255,255,255,.03)}
+
+/* Tech pills */
+.pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.pill{padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04)}
+.pill-az{border-color:rgba(59,130,246,.3);color:#93c5fd;background:rgba(59,130,246,.08)}
+.pill-ai{border-color:rgba(16,185,129,.3);color:#6ee7b7;background:rgba(16,185,129,.08)}
+.pill-tool{border-color:rgba(245,158,11,.3);color:#fcd34d;background:rgba(245,158,11,.08)}
+
+/* Screenshot placeholder */
+.screenshot{background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.12);border-radius:12px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3);font-size:13px;font-weight:500;min-height:140px;text-align:center;padding:20px}
+
+/* Bullet list */
+.blist{list-style:none;padding:0;margin-top:10px}
+.blist li{padding:8px 0 8px 24px;position:relative;font-size:14px;color:rgba(255,255,255,.7);line-height:1.5}
+.blist li::before{content:'';position:absolute;left:0;top:15px;width:8px;height:8px;border-radius:50%;background:rgba(139,92,246,.6)}
+
+/* Flow arrow nodes for diagrams */
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center}
+.fnode{padding:10px 16px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;min-width:90px}
+.farrow{color:rgba(255,255,255,.3);font-size:18px}
+
+/* Title slide special */
+.title-meta{margin-top:auto;display:flex;gap:32px;font-size:14px;color:rgba(255,255,255,.4)}
+.title-meta span{display:flex;align-items:center;gap:6px}
+.accent-line{width:60px;height:4px;border-radius:2px;background:linear-gradient(90deg,#8b5cf6,#3b82f6);margin-bottom:20px}
+
+.content-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- SLIDE 1: Title -->
+<div class="slide s1 active" data-n="1">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="accent-line"></div>
+    <h1 style="font-size:46px">Adaptive Learning Assistant</h1>
+    <p style="font-size:22px;color:rgba(255,255,255,.5);margin-top:4px;font-weight:300">Multi-Agent AI System</p>
+    <p style="font-size:15px;color:rgba(255,255,255,.35);margin-top:24px;line-height:1.7">
+      An intelligent tutoring platform powered by Azure AI Foundry,<br>
+      orchestrating specialized agents to deliver personalized learning experiences.
+    </p>
+    <div class="title-meta">
+      <span>📅 March 2026</span>
+      <span>👤 [Your Name]</span>
+      <span>🏷️ AI / Education</span>
+    </div>
+  </div>
+  <div class="slide-num">01 / 10</div>
+</div>
+
+<!-- SLIDE 2: Problem Statement -->
+<div class="slide s2" data-n="2">
+  <span class="tag tag-purple">Problem Statement</span>
+  <h2>Why Adaptive Learning Matters</h2>
+  <p class="subtitle">Traditional e-learning is static, one-size-fits-all, and fails to adapt to individual learner needs.</p>
+  <div class="grid2 content-area" style="flex:unset">
+    <div class="card" style="border-left:3px solid #ef4444">
+      <h3 style="color:#fca5a5">🚫 The Problem</h3>
+      <ul class="blist">
+        <li>Static curricula ignore learner pace & gaps</li>
+        <li>No real-time feedback or scoring</li>
+        <li>Instructors can't personalize at scale</li>
+        <li>Learner engagement drops without adaptation</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:3px solid #10b981">
+      <h3 style="color:#6ee7b7">✅ Our Solution</h3>
+      <ul class="blist">
+        <li>Multi-agent system adapts in real time</li>
+        <li>RAG-powered content retrieval from training notes</li>
+        <li>Automated quiz generation & grading</li>
+        <li>Persistent learner state tracks mastery</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px;border-left:3px solid #8b5cf6">
+    <h3 style="color:#c4b5fd">💡 Key Insight</h3>
+    <p>By decomposing the learning loop into specialized agents — intake, planning, retrieval, feedback, and tracking — we achieve modular, testable, and scalable AI-driven education.</p>
+  </div>
+  <div class="slide-num">02 / 10</div>
+</div>
+
+<!-- SLIDE 3: Architecture Diagram -->
+<div class="slide s3" data-n="3">
+  <span class="tag tag-blue">System Design</span>
+  <h2>Architecture Overview</h2>
+  <p class="subtitle">Multi-agent architecture on Azure AI Foundry</p>
+  <div class="diagram-box" style="flex:1;min-height:0">
+    <svg viewBox="0 0 780 420" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+      <!-- Outer box -->
+      <rect x="20" y="10" width="740" height="400" rx="16" fill="rgba(99,102,241,.07)" stroke="rgba(99,102,241,.25)" stroke-width="1.5"/>
+      <text x="390" y="38" text-anchor="middle" fill="#a5b4fc" font-size="13" font-weight="700" font-family="Inter">Adaptive Learning Assistant — Multi-Agent Architecture</text>
+
+      <!-- Intake Agent (top) -->
+      <rect x="310" y="54" width="160" height="48" rx="10" fill="rgba(239,68,68,.15)" stroke="rgba(239,68,68,.4)" stroke-width="1.2"/>
+      <text x="390" y="74" text-anchor="middle" fill="#fca5a5" font-size="12" font-weight="700" font-family="Inter">Intake Agent</text>
+      <text x="390" y="91" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="10" font-family="Inter">Copilot Studio</text>
+
+      <!-- Arrow down -->
+      <line x1="390" y1="102" x2="390" y2="125" stroke="rgba(255,255,255,.2)" stroke-width="1.5" marker-end="url(#arrowW)"/>
+
+      <!-- Azure AI Foundry box -->
+      <rect x="80" y="125" width="620" height="110" rx="14" fill="rgba(16,185,129,.06)" stroke="rgba(16,185,129,.25)" stroke-width="1.2"/>
+      <text x="390" y="148" text-anchor="middle" fill="#6ee7b7" font-size="12" font-weight="700" font-family="Inter">Azure AI Foundry — Agent Service</text>
+
+      <!-- 3 agents inside -->
+      <rect x="110" y="162" width="150" height="52" rx="8" fill="rgba(59,130,246,.12)" stroke="rgba(59,130,246,.35)" stroke-width="1"/>
+      <text x="185" y="183" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="600" font-family="Inter">Planner Agent</text>
+      <text x="185" y="200" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="9" font-family="Inter">Learning paths</text>
+
+      <rect x="315" y="162" width="150" height="52" rx="8" fill="rgba(16,185,129,.12)" stroke="rgba(16,185,129,.35)" stroke-width="1"/>
+      <text x="390" y="183" text-anchor="middle" fill="#6ee7b7" font-size="11" font-weight="600" font-family="Inter">RAG Agent</text>
+      <text x="390" y="200" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="9" font-family="Inter">Content retrieval</text>
+
+      <rect x="520" y="162" width="150" height="52" rx="8" fill="rgba(245,158,11,.12)" stroke="rgba(245,158,11,.35)" stroke-width="1"/>
+      <text x="595" y="183" text-anchor="middle" fill="#fcd34d" font-size="11" font-weight="600" font-family="Inter">Feedback Agent</text>
+      <text x="595" y="200" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="9" font-family="Inter">Quiz &amp; scoring</text>
+
+      <!-- Arrow down from Foundry -->
+      <line x1="390" y1="235" x2="390" y2="260" stroke="rgba(255,255,255,.2)" stroke-width="1.5" marker-end="url(#arrowW)"/>
+
+      <!-- Progress Tracker -->
+      <rect x="280" y="260" width="220" height="48" rx="10" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.3)" stroke-width="1.2"/>
+      <text x="390" y="280" text-anchor="middle" fill="#fcd34d" font-size="12" font-weight="700" font-family="Inter">Progress Tracker Agent</text>
+      <text x="390" y="296" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="10" font-family="Inter">Learner state management</text>
+
+      <!-- Dashed loop line -->
+      <path d="M500 268 Q 680 268 680 188 Q 680 162 670 162" fill="none" stroke="rgba(239,68,68,.3)" stroke-width="1.2" stroke-dasharray="5,4"/>
+      <text x="710" y="220" fill="rgba(239,68,68,.5)" font-size="10" font-family="Inter" font-style="italic">loop</text>
+
+      <!-- Arrow down -->
+      <line x1="390" y1="308" x2="390" y2="330" stroke="rgba(255,255,255,.2)" stroke-width="1.5" marker-end="url(#arrowW)"/>
+
+      <!-- Data layer -->
+      <rect x="100" y="330" width="580" height="48" rx="10" fill="rgba(16,185,129,.06)" stroke="rgba(16,185,129,.2)" stroke-width="1"/>
+      <text x="390" y="348" text-anchor="middle" fill="#6ee7b7" font-size="11" font-weight="700" font-family="Inter">Data Layer</text>
+      <text x="210" y="367" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="10" font-family="Inter">Azure AI Search</text>
+      <text x="390" y="367" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="10" font-family="Inter">Blob Storage</text>
+      <text x="570" y="367" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="10" font-family="Inter">Key Vault</text>
+
+      <!-- Models row -->
+      <rect x="100" y="390" width="580" height="15" rx="4" fill="rgba(255,255,255,.03)"/>
+      <text x="210" y="402" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">GPT-4o</text>
+      <text x="390" y="402" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">text-embedding-ada-002</text>
+      <text x="570" y="402" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">FLUX</text>
+
+      <defs><marker id="arrowW" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="rgba(255,255,255,.3)"/></marker></defs>
+    </svg>
+  </div>
+  <div class="slide-num">03 / 10</div>
+</div>
+
+<!-- SLIDE 4: Agent Workflow -->
+<div class="slide s4" data-n="4">
+  <span class="tag tag-green">Workflow</span>
+  <h2>Agent Session Flow</h2>
+  <p class="subtitle">How a learner session flows through the agent pipeline</p>
+  <div class="diagram-box" style="flex:1;min-height:0">
+    <svg viewBox="0 0 780 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+      <!-- Learner -->
+      <rect x="310" y="10" width="160" height="40" rx="20" fill="rgba(255,255,255,.08)" stroke="rgba(255,255,255,.2)"/>
+      <text x="390" y="35" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600" font-family="Inter">Learner</text>
+      <text x="390" y="62" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">name, topic, level</text>
+      <line x1="390" y1="50" x2="390" y2="75" stroke="rgba(255,255,255,.2)" stroke-width="1.2" marker-end="url(#arrowW2)"/>
+
+      <!-- 1. Intake -->
+      <rect x="290" y="75" width="200" height="46" rx="10" fill="rgba(239,68,68,.1)" stroke="rgba(239,68,68,.3)"/>
+      <text x="390" y="95" text-anchor="middle" fill="#fca5a5" font-size="12" font-weight="700" font-family="Inter">1. Intake Agent</text>
+      <text x="390" y="112" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="10" font-family="Inter">Collect learner profile</text>
+      <text x="390" y="133" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="9" font-family="Inter">profile data ↓</text>
+      <line x1="390" y1="121" x2="390" y2="145" stroke="rgba(255,255,255,.15)" stroke-width="1.2" marker-end="url(#arrowW2)"/>
+
+      <!-- 2. Planner -->
+      <rect x="290" y="145" width="200" height="46" rx="10" fill="rgba(59,130,246,.1)" stroke="rgba(59,130,246,.3)"/>
+      <text x="390" y="165" text-anchor="middle" fill="#93c5fd" font-size="12" font-weight="700" font-family="Inter">2. Planner Agent</text>
+      <text x="390" y="182" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="10" font-family="Inter">Build learning path</text>
+      <text x="390" y="203" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="9" font-family="Inter">topic request ↓</text>
+      <line x1="390" y1="191" x2="390" y2="215" stroke="rgba(255,255,255,.15)" stroke-width="1.2" marker-end="url(#arrowW2)"/>
+
+      <!-- 3. RAG -->
+      <rect x="290" y="215" width="200" height="46" rx="10" fill="rgba(16,185,129,.1)" stroke="rgba(16,185,129,.3)"/>
+      <text x="390" y="235" text-anchor="middle" fill="#6ee7b7" font-size="12" font-weight="700" font-family="Inter">3. RAG Agent</text>
+      <text x="390" y="252" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="10" font-family="Inter">Retrieve curriculum content</text>
+      <text x="390" y="273" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="9" font-family="Inter">quiz + answers ↓</text>
+      <line x1="390" y1="261" x2="390" y2="285" stroke="rgba(255,255,255,.15)" stroke-width="1.2" marker-end="url(#arrowW2)"/>
+
+      <!-- 4. Feedback -->
+      <rect x="290" y="285" width="200" height="46" rx="10" fill="rgba(236,72,153,.1)" stroke="rgba(236,72,153,.3)"/>
+      <text x="390" y="305" text-anchor="middle" fill="#f9a8d4" font-size="12" font-weight="700" font-family="Inter">4. Feedback Agent</text>
+      <text x="390" y="322" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="10" font-family="Inter">Evaluate and score</text>
+      <text x="390" y="343" text-anchor="middle" fill="rgba(255,255,255,.25)" font-size="9" font-family="Inter">scores + state ↓</text>
+      <line x1="390" y1="331" x2="390" y2="350" stroke="rgba(255,255,255,.15)" stroke-width="1.2" marker-end="url(#arrowW2)"/>
+
+      <!-- 5. Progress -->
+      <rect x="290" y="350" width="200" height="46" rx="10" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.3)"/>
+      <text x="390" y="370" text-anchor="middle" fill="#fcd34d" font-size="12" font-weight="700" font-family="Inter">5. Progress Tracker</text>
+      <text x="390" y="386" text-anchor="middle" fill="rgba(255,255,255,.35)" font-size="10" font-family="Inter">Maintain learner state</text>
+
+      <!-- Loop arrow -->
+      <path d="M490 365 Q 600 365 600 230 Q 600 170 490 170" fill="none" stroke="rgba(239,68,68,.35)" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrowR)"/>
+      <text x="620" y="270" fill="rgba(239,68,68,.5)" font-size="11" font-family="Inter" font-style="italic">loop</text>
+
+      <defs>
+        <marker id="arrowW2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="rgba(255,255,255,.25)"/></marker>
+        <marker id="arrowR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="rgba(239,68,68,.4)"/></marker>
+      </defs>
+    </svg>
+  </div>
+  <div class="slide-num">04 / 10</div>
+</div>
+
+<!-- SLIDE 5: RAG Pipeline -->
+<div class="slide s5" data-n="5">
+  <span class="tag tag-green">RAG Pipeline</span>
+  <h2>Ingestion &amp; Retrieval</h2>
+  <p class="subtitle">How training notes become grounded answers</p>
+  <div class="diagram-box" style="flex:1;min-height:0">
+    <svg viewBox="0 0 780 360" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+      <!-- Ingestion label -->
+      <text x="390" y="24" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="13" font-weight="700" font-family="Inter">RAG Pipeline — Ingestion</text>
+
+      <!-- Ingestion row -->
+      <rect x="20" y="42" width="130" height="50" rx="10" fill="rgba(132,204,22,.1)" stroke="rgba(132,204,22,.3)"/>
+      <text x="85" y="63" text-anchor="middle" fill="#bef264" font-size="11" font-weight="600" font-family="Inter">Training Notes</text>
+      <text x="85" y="80" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">Days 1–12</text>
+
+      <line x1="150" y1="67" x2="175" y2="67" stroke="rgba(255,255,255,.2)" stroke-width="1.2" marker-end="url(#arrowW3)"/>
+
+      <rect x="175" y="42" width="120" height="50" rx="10" fill="rgba(16,185,129,.1)" stroke="rgba(16,185,129,.3)"/>
+      <text x="235" y="63" text-anchor="middle" fill="#6ee7b7" font-size="11" font-weight="600" font-family="Inter">Crack</text>
+      <text x="235" y="80" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">Extract text</text>
+
+      <line x1="295" y1="67" x2="320" y2="67" stroke="rgba(255,255,255,.2)" stroke-width="1.2" marker-end="url(#arrowW3)"/>
+
+      <rect x="320" y="42" width="120" height="50" rx="10" fill="rgba(16,185,129,.1)" stroke="rgba(16,185,129,.3)"/>
+      <text x="380" y="63" text-anchor="middle" fill="#6ee7b7" font-size="11" font-weight="600" font-family="Inter">Chunk</text>
+      <text x="380" y="80" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">Split into parts</text>
+
+      <line x1="440" y1="67" x2="465" y2="67" stroke="rgba(255,255,255,.2)" stroke-width="1.2" marker-end="url(#arrowW3)"/>
+
+      <rect x="465" y="42" width="120" height="50" rx="10" fill="rgba(59,130,246,.1)" stroke="rgba(59,130,246,.3)"/>
+      <text x="525" y="63" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="600" font-family="Inter">Embed</text>
+      <text x="525" y="80" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">ada-002</text>
+
+      <line x1="585" y1="67" x2="610" y2="67" stroke="rgba(255,255,255,.2)" stroke-width="1.2" marker-end="url(#arrowW3)"/>
+
+      <rect x="610" y="42" width="150" height="50" rx="10" fill="rgba(59,130,246,.1)" stroke="rgba(59,130,246,.3)"/>
+      <text x="685" y="63" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="600" font-family="Inter">AI Search</text>
+      <text x="685" y="80" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">Vector index</text>
+
+      <!-- Divider -->
+      <line x1="40" y1="120" x2="740" y2="120" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+
+      <!-- Retrieval label -->
+      <text x="390" y="150" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="13" font-weight="700" font-family="Inter">Retrieval at Query Time</text>
+
+      <!-- Retrieval row -->
+      <rect x="20" y="170" width="140" height="50" rx="10" fill="rgba(239,68,68,.1)" stroke="rgba(239,68,68,.3)"/>
+      <text x="90" y="191" text-anchor="middle" fill="#fca5a5" font-size="11" font-weight="600" font-family="Inter">User Query</text>
+      <text x="90" y="208" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">From agent</text>
+
+      <line x1="160" y1="195" x2="195" y2="195" stroke="rgba(255,255,255,.2)" stroke-width="1.2" marker-end="url(#arrowW3)"/>
+
+      <rect x="195" y="170" width="140" height="50" rx="10" fill="rgba(16,185,129,.1)" stroke="rgba(16,185,129,.3)"/>
+      <text x="265" y="191" text-anchor="middle" fill="#6ee7b7" font-size="11" font-weight="600" font-family="Inter">Embed Query</text>
+      <text x="265" y="208" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">ada-002</text>
+
+      <line x1="335" y1="195" x2="370" y2="195" stroke="rgba(255,255,255,.2)" stroke-width="1.2" marker-end="url(#arrowW3)"/>
+
+      <rect x="370" y="170" width="150" height="50" rx="10" fill="rgba(59,130,246,.12)" stroke="rgba(59,130,246,.3)"/>
+      <text x="445" y="191" text-anchor="middle" fill="#93c5fd" font-size="11" font-weight="600" font-family="Inter">Search Index</text>
+      <text x="445" y="208" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">Semantic match</text>
+
+      <line x1="520" y1="195" x2="555" y2="195" stroke="rgba(255,255,255,.2)" stroke-width="1.2" marker-end="url(#arrowW3)"/>
+
+      <rect x="555" y="170" width="150" height="50" rx="10" fill="rgba(139,92,246,.12)" stroke="rgba(139,92,246,.3)"/>
+      <text x="630" y="191" text-anchor="middle" fill="#c4b5fd" font-size="11" font-weight="600" font-family="Inter">GPT-4o</text>
+      <text x="630" y="208" text-anchor="middle" fill="rgba(255,255,255,.3)" font-size="9" font-family="Inter">Grounded answer</text>
+
+      <!-- Arrow down to response -->
+      <line x1="630" y1="220" x2="630" y2="265" stroke="rgba(255,255,255,.2)" stroke-width="1.2" marker-end="url(#arrowW3)"/>
+
+      <rect x="510" y="265" width="240" height="50" rx="10" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.3)"/>
+      <text x="630" y="288" text-anchor="middle" fill="#fcd34d" font-size="12" font-weight="700" font-family="Inter">Response with citations</text>
+
+      <defs><marker id="arrowW3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="rgba(255,255,255,.25)"/></marker></defs>
+    </svg>
+  </div>
+  <div class="slide-num">05 / 10</div>
+</div>
+
+<!-- SLIDE 6: Technology Stack -->
+<div class="slide s6" data-n="6">
+  <span class="tag tag-blue">Technology</span>
+  <h2>Technology Stack</h2>
+  <p class="subtitle">Core services and frameworks powering the system</p>
+  <div class="grid3" style="margin-top:16px">
+    <div class="card" style="border-top:3px solid #3b82f6">
+      <h3 style="color:#93c5fd">☁️ Azure Platform</h3>
+      <div class="pills" style="margin-top:10px;flex-direction:column">
+        <span class="pill pill-az">Azure AI Foundry</span>
+        <span class="pill pill-az">Azure AI Search</span>
+        <span class="pill pill-az">Azure Blob Storage</span>
+        <span class="pill pill-az">Azure Key Vault</span>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid #10b981">
+      <h3 style="color:#6ee7b7">🧠 AI Models</h3>
+      <div class="pills" style="margin-top:10px;flex-direction:column">
+        <span class="pill pill-ai">GPT-4o (reasoning)</span>
+        <span class="pill pill-ai">text-embedding-ada-002</span>
+        <span class="pill pill-ai">FLUX (image gen)</span>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid #f59e0b">
+      <h3 style="color:#fcd34d">🛠️ Tools &amp; SDKs</h3>
+      <div class="pills" style="margin-top:10px;flex-direction:column">
+        <span class="pill pill-tool">Semantic Kernel</span>
+        <span class="pill pill-tool">Copilot Studio</span>
+        <span class="pill pill-tool">Python SDK</span>
+        <span class="pill pill-tool">Azure CLI</span>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.15)">
+    <p style="font-size:13px"><strong style="color:#c4b5fd">Why this stack?</strong> — Azure AI Foundry provides native multi-agent orchestration with built-in tool calling. Semantic Kernel handles agent-to-agent handoffs. Copilot Studio gives a no-code front-end for the intake experience.</p>
+  </div>
+  <div class="slide-num">06 / 10</div>
+</div>
+
+<!-- SLIDE 7: Agent Details -->
+<div class="slide s7" data-n="7">
+  <span class="tag tag-purple">Agent Details</span>
+  <h2>Agent Breakdown</h2>
+  <p class="subtitle">Each agent's role, runtime location, and tools</p>
+  <div style="flex:1;overflow:auto">
+    <table class="tbl">
+      <thead>
+        <tr><th>#</th><th>Agent</th><th>Role</th><th>Location</th><th>Tools / Models</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:#fca5a5;font-weight:700">1</td>
+          <td style="font-weight:600">Intake Agent</td>
+          <td>Collect learner name, topic, and level</td>
+          <td>Copilot Studio</td>
+          <td>Adaptive cards, topic entities</td>
+        </tr>
+        <tr>
+          <td style="color:#93c5fd;font-weight:700">2</td>
+          <td style="font-weight:600">Planner Agent</td>
+          <td>Generate personalized learning path</td>
+          <td>Azure AI Foundry</td>
+          <td>GPT-4o, Semantic Kernel</td>
+        </tr>
+        <tr>
+          <td style="color:#6ee7b7;font-weight:700">3</td>
+          <td style="font-weight:600">RAG Agent</td>
+          <td>Retrieve curriculum from training notes</td>
+          <td>Azure AI Foundry</td>
+          <td>AI Search, ada-002, GPT-4o</td>
+        </tr>
+        <tr>
+          <td style="color:#f9a8d4;font-weight:700">4</td>
+          <td style="font-weight:600">Feedback Agent</td>
+          <td>Generate quizzes, evaluate, and score</td>
+          <td>Azure AI Foundry</td>
+          <td>GPT-4o, scoring functions</td>
+        </tr>
+        <tr>
+          <td style="color:#fcd34d;font-weight:700">5</td>
+          <td style="font-weight:600">Progress Tracker</td>
+          <td>Maintain learner state and mastery levels</td>
+          <td>Azure AI Foundry</td>
+          <td>State store, JSON schema</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card" style="margin-top:14px;border-left:3px solid #6ee7b7">
+    <p style="font-size:13px"><strong style="color:#6ee7b7">Orchestration:</strong> The Planner agent acts as the orchestrator, delegating topic requests to the RAG agent and quiz results to the Feedback agent in a loop until mastery is achieved.</p>
+  </div>
+  <div class="slide-num">07 / 10</div>
+</div>
+
+<!-- SLIDE 8: Screenshots -->
+<div class="slide s8" data-n="8">
+  <span class="tag tag-orange">Screenshots</span>
+  <h2>System in Action</h2>
+  <p class="subtitle">Key interfaces from the deployed system</p>
+  <div class="grid2" style="flex:1;min-height:0">
+    <div class="screenshot" style="flex-direction:column;gap:8px">
+      <div style="font-size:28px">💬</div>
+      <div>Copilot Studio — Chat UI</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.2)">Insert screenshot of learner intake conversation</div>
+    </div>
+    <div class="screenshot" style="flex-direction:column;gap:8px">
+      <div style="font-size:28px">🤖</div>
+      <div>Azure AI Foundry — Agents Page</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.2)">Insert screenshot of deployed agents list</div>
+    </div>
+    <div class="screenshot" style="flex-direction:column;gap:8px">
+      <div style="font-size:28px">🔍</div>
+      <div>Azure AI Search — Index Results</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.2)">Insert screenshot of vector search results</div>
+    </div>
+    <div class="screenshot" style="flex-direction:column;gap:8px">
+      <div style="font-size:28px">📊</div>
+      <div>Learner Progress Dashboard</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.2)">Insert screenshot of mastery tracking</div>
+    </div>
+  </div>
+  <div class="slide-num">08 / 10</div>
+</div>
+
+<!-- SLIDE 9: Screenshots Continued -->
+<div class="slide s9" data-n="9">
+  <span class="tag tag-orange">Screenshots</span>
+  <h2>Orchestrator Output</h2>
+  <p class="subtitle">Terminal output showing the full learning session flow</p>
+  <div class="diagram-box" style="flex:1;min-height:0;background:rgba(0,0,0,.4);font-family:'Courier New',monospace;font-size:12px;color:#6ee7b7;overflow:auto;padding:20px;line-height:1.8">
+    <div style="color:rgba(255,255,255,.3)">$ python orchestrator.py --learner "Alex" --topic "Azure AI" --level "beginner"</div>
+    <br>
+    <div><span style="color:#fca5a5">[Intake]</span> Learner profile collected: Alex, Azure AI, beginner</div>
+    <div><span style="color:#93c5fd">[Planner]</span> Generated learning path: 4 topics</div>
+    <div style="color:rgba(255,255,255,.25)">  → Topic 1: Introduction to Azure AI Services</div>
+    <div style="color:rgba(255,255,255,.25)">  → Topic 2: Azure AI Foundry Basics</div>
+    <div style="color:rgba(255,255,255,.25)">  → Topic 3: Building AI Agents</div>
+    <div style="color:rgba(255,255,255,.25)">  → Topic 4: RAG Patterns</div>
+    <br>
+    <div><span style="color:#6ee7b7">[RAG]</span> Retrieved 3 chunks for "Introduction to Azure AI Services"</div>
+    <div><span style="color:#6ee7b7">[RAG]</span> Generated teaching content (842 tokens)</div>
+    <div><span style="color:#f9a8d4">[Feedback]</span> Quiz generated: 3 questions</div>
+    <div><span style="color:#f9a8d4">[Feedback]</span> Score: 2/3 (67%) — needs review</div>
+    <div><span style="color:#fcd34d">[Progress]</span> State updated: Topic 1 = in_progress</div>
+    <br>
+    <div style="color:rgba(255,255,255,.3)">↻ Looping back to Planner for remediation...</div>
+    <br>
+    <div><span style="color:#6ee7b7">[RAG]</span> Retrieved 2 targeted chunks for weak areas</div>
+    <div><span style="color:#f9a8d4">[Feedback]</span> Re-quiz score: 3/3 (100%) ✓</div>
+    <div><span style="color:#fcd34d">[Progress]</span> State updated: Topic 1 = <span style="color:#6ee7b7;font-weight:bold">mastered</span></div>
+    <div style="color:rgba(255,255,255,.3)">→ Advancing to Topic 2...</div>
+    <br>
+    <div style="color:rgba(255,255,255,.15)">Insert your actual terminal screenshot here</div>
+  </div>
+  <div class="slide-num">09 / 10</div>
+</div>
+
+<!-- SLIDE 10: Conclusion -->
+<div class="slide s10" data-n="10">
+  <span class="tag tag-purple">Conclusion</span>
+  <h2>Key Learnings &amp; Next Steps</h2>
+  <div class="grid2" style="margin-top:16px">
+    <div class="card" style="border-left:3px solid #10b981">
+      <h3 style="color:#6ee7b7">✅ What Worked</h3>
+      <ul class="blist">
+        <li>Multi-agent decomposition made each component testable in isolation</li>
+        <li>RAG grounding reduced hallucination significantly</li>
+        <li>Copilot Studio provided instant no-code front-end</li>
+        <li>Feedback loop drove genuine learner improvement</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:3px solid #f59e0b">
+      <h3 style="color:#fcd34d">⚡ Challenges</h3>
+      <ul class="blist">
+        <li>Agent-to-agent handoff latency</li>
+        <li>Chunk size tuning for optimal retrieval</li>
+        <li>State management across multi-turn sessions</li>
+        <li>Prompt engineering for consistent quiz quality</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px;border-left:3px solid #8b5cf6">
+    <h3 style="color:#c4b5fd">🚀 Future Improvements</h3>
+    <ul class="blist">
+      <li>Add multi-modal content delivery (images via FLUX, video summaries)</li>
+      <li>Implement spaced repetition scheduling across sessions</li>
+      <li>Dashboard for instructors to monitor cohort progress</li>
+      <li>Support for collaborative learning with peer agents</li>
+    </ul>
+  </div>
+  <div style="margin-top:auto;text-align:center;padding:16px">
+    <p style="font-size:18px;color:rgba(255,255,255,.6);font-weight:300">Thank you! Questions?</p>
+  </div>
+  <div class="slide-num">10 / 10</div>
+</div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button onclick="go(-1)">◀</button>
+  <div class="counter"><span id="cur">1</span>&nbsp;/&nbsp;10</div>
+  <button onclick="go(1)">▶</button>
+</div>
+
+<script>
+let c=1;const t=10;
+function go(d){
+  const n=c+d;
+  if(n<1||n>t)return;
+  document.querySelector(`.slide[data-n="${c}"]`).classList.remove('active');
+  c=n;
+  document.querySelector(`.slide[data-n="${c}"]`).classList.add('active');
+  document.getElementById('cur').textContent=c;
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' ')go(1);
+  if(e.key==='ArrowLeft')go(-1);
+});
+</script>
+</body>
+</html>
